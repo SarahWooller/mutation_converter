@@ -84,8 +84,7 @@ output_dire = args.output_dire
 gene_type = ' '.join(args.gene_type.split('_'))
 output_dire = args.output_dire
 
-
-data_dire = '/its/home/skw24/Converter/'
+data_dire = os.path.dirname(os.path.abspath(__file__))
 
 def get_multi_converter():
     '''multi_converter enables conversions between 'Entrez gene ID', 'Fasta', 'Gene name', 
@@ -93,7 +92,7 @@ def get_multi_converter():
     'UniProtKB/Swiss-Prot ID', 'UniProtKB/TrEMBL ID'. It is constructed from information 
     downloaded from biomart and from David https://david.ncifcrf.gov/conversion.jsp
     '''
-    return 
+    return pd.DataFrame.from_csv(os.path.join(data_dire,'/its/home/skw24/mutation_converter/mutation_converter/gene_multi_converter.csv'))
 
 def converter(gene,labela,labelb):
     """Enables conversion of genes/proteins between different biomart labels. 
