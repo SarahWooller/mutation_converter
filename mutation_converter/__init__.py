@@ -218,43 +218,44 @@ def make_multi_list(name,mylist,output_dire):
         n+=1
 
 
+def main():
 
+    with open(path,'r') as f:
 
-with open(path,'r') as f:
+        try:
+            mutation_list = f.read().split('\n')
 
-    try:
-        mutation_list = f.read().split('\n')
-
-    except FileNotFoundError:
-        print('file not found')
+        except FileNotFoundError:
+            print('file not found')
         
-    #take out duplicates
-    mutation_list =list(pd.Series(mutation_list).drop_duplicates())        
-    muts = [Mutation(i,gene_type) for i in mutation_list]
-    wilds = [i.wild_fasta for i in muts]
-    mutants = [i.mut_fasta for i in muts]
-    messages = [i.message for i in muts]
+        #take out duplicates
+        mutation_list =list(pd.Series(mutation_list).drop_duplicates())        
+        muts = [Mutation(i,gene_type) for i in mutation_list]
+        wilds = [i.wild_fasta for i in muts]
+        mutants = [i.mut_fasta for i in muts]
+        messages = [i.message for i in muts]
 
-#group all the wild fastas together so that the same one is not repeated twice
-wilds0 = pd.DataFrame(pd.Series(wilds,index = mutation_list),columns = ['Fastas'])
-wild_series = pd.Series(wilds0.groupby(by = 'Fastas').groups)
-wild_series1=pd.Series(wild_series.index)
-wild_series1.index = wild_series.map(lambda x:'|'.join(x))
-s2 = wild_series1.loc[wild_series1!='']
-wild_fasta_list = list('>'+s2.index+'\n'+s2)
-mutant_series = pd.Series(mutants,index = mutation_list)
-mutant_series = mutant_series[mutant_series!='']
-mut_fasta_list = list('>'+mutant_series.index+'\n'+mutant_series)
+    #group all the wild fastas together so that the same one is not repeated twice
+    wilds0 = pd.DataFrame(pd.Series(wilds,index = mutation_list),columns = ['Fastas'])
+    wild_series = pd.Series(wilds0.groupby(by = 'Fastas').groups)
+    wild_series1=pd.Series(wild_series.index)
+    wild_series1.index = wild_series.map(lambda x:'|'.join(x))
+    s2 = wild_series1.loc[wild_series1!='']
+    wild_fasta_list = list('>'+s2.index+'\n'+s2)
+    mutant_series = pd.Series(mutants,index = mutation_list)
+    mutant_series = mutant_series[mutant_series!='']
+    mut_fasta_list = list('>'+mutant_series.index+'\n'+mutant_series)
 
-#explain what has gone wrong with the process
-messages_series = pd.Series(messages, index = mutation_list)
-wrong = messages_series[messages_series!='']
-with open(os.path.join(output_dire,'errors.txt'),'w') as f:
-    f.write('\n'.join(list(wrong.index+'\n'+wrong)))
+    #explain what has gone wrong with the process
+    messages_series = pd.Series(messages, index = mutation_list)
+    wrong = messages_series[messages_series!='']
+    with open(os.path.join(output_dire,'errors.txt'),'w') as f:
+        f.write('\n'.join(list(wrong.index+'\n'+wrong)))
 
-#split up the fasta lists into manageable lengths
-make_multi_list('wild',wild_fasta_list,output_dire)
-make_multi_list('mutant',mut_fasta_list,output_dire)
+    #split up the fasta lists into manageable lengths
+    make_multi_list('wild',wild_fasta_list,output_dire)
+    make_multi_list('mutant',mut_fasta_list,output_dire)
 
-
+if '__name__' == '__main__':
+    main()
 
